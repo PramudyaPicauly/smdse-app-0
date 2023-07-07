@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String        @default(cuid()) @db.Text
+  email    String?       @db.VarChar(32)
+  password String?       @db.Text
+  name     String?       @db.Text
+  position UserPosition?
+  role     UserRole      @default(USER)
+  isActive Boolean       @default(true)
+
+  documentCreated  Document[]
+  documentReceived UserOnDocument[]
+
+  @@id([id])
+  @@unique([email])
+}
+
+enum UserRole {
+  USER
+  SUPERUSER
+  ADMIN
+}
+
+enum UserPosition {
+  DIREKSI
+  MANAJEMEN_REPRESENTATIVE
+  AUDITOR_INTERNAL
+  MANAJER_SERTIFIKASI
+  PENANGGUNG_JAWAB_TEKNIK
+  KOORDINATOR_PJT
+  TENAGA_TEKNIK
+  ADMINISTRATOR_UJI
+  STAFF_ADMINISTRASI
+  STAFF_KEUANGAN
+}
+
+model Document {
+  id         String        @default(cuid()) @db.Text
+  createdAt  DateTime      @default(now()) @db.Timestamp()
+  isSent     Boolean       @default(false)
+  isApproved Boolean       @default(false)
+  content    Json?         @db.JsonB
+  type       DocumentType?
+
+  author     User?            @relation(fields: [authorId], references: [id])
+  authorId   String?
+  recipients UserOnDocument[]
+
+  @@id([id])
+}
+
+enum DocumentType {
+  DISPOSISI
+  MARKETING
+}
+
+model UserOnDocument {
+  recipient   User     @relation(fields: [recipientId], references: [id])
+  recipientId String
+  document    Document @relation(fields: [documentId], references: [id])
+  documentId  String
+  createdAt   DateTime @default(now()) @db.Timestamp()
+  isRead      Boolean  @default(false)
+
+  @@id([recipientId, documentId])
+}
