@@ -94,7 +94,9 @@ export default function SignIn() {
 							alt="logo_gemapedekabe"
 							className="w-40 bg-gray-200 rounded-full"
 						/>
-						<h2 className="text-center text-4xl font-bold">Sign In</h2>
+						<h2 className="text-center text-4xl font-bold text-red-900">
+							Sign In
+						</h2>
 					</div>
 					{/* USERNAME */}
 					<div className="flex flex-col">

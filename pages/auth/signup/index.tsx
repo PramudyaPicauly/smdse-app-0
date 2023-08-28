@@ -36,7 +36,7 @@ export default function SignUp() {
 			role: "USER",
 		});
 
-	// CHECKING SESSION
+	// CHECKING SESSIONS
 	useEffect(() => {
 		if (status === "unauthenticated") router.replace("/auth/signin");
 	}, [status]);
