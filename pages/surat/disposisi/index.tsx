@@ -33,12 +33,14 @@ export default function Disposisi() {
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchData, setSearchData] = useState([]);
 
+	const [pageState, setPageState] = useState<number>(0);
+
 	const {
 		data,
 		error,
 		isLoading,
 	}: { data: IDocumentData[]; error: any; isLoading: boolean } = useSWR(
-		session ? disposisiURL : null,
+		session ? `/api/documents/disposisi?page=${pageState}` : null,
 		fetcher,
 		{
 			refreshInterval: 1000,
@@ -258,10 +260,17 @@ export default function Disposisi() {
 						</tbody>
 					</table>
 				</div>
-				{/* <div className="flex divide-x-2 divide-gray-600 w-fit ml-auto rounded-md bg-gray-800 text-white">
+				<div className="flex divide-x-2 divide-gray-600 w-fit ml-auto rounded-md bg-gray-800 text-white">
 					<button
 						type="button"
 						className="px-3 py-2 rounded-l-md hover:bg-gray-600"
+						onClick={() => {
+							if (pageState - 1 < 0) {
+								setPageState(0);
+							} else {
+								setPageState(pageState - 1);
+							}
+						}}
 					>
 						Prev
 					</button>
@@ -274,10 +283,17 @@ export default function Disposisi() {
 					<button
 						type="button"
 						className="px-3 py-2 rounded-r-md hover:bg-gray-600"
+						onClick={() => {
+							if (pageState + 1 > 2) {
+								setPageState(pageState);
+							} else {
+								setPageState(pageState + 1);
+							}
+						}}
 					>
 						Next
 					</button>
-				</div> */}
+				</div>
 			</Layout>
 		</>
 	);

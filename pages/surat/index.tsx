@@ -76,35 +76,32 @@ export default function SuratTerbaru() {
 									</td>
 								</tr>
 							) : documentData?.length > 3 ? (
-								documentData
-									.slice(-3)
-									.reverse()
-									.map((d: any, i: any) => {
-										return (
-											<tr key={i} className="hover:bg-gray-700">
-												<td className="px-6 py-4">{d.type}</td>
-												<td className="px-6 py-4">{d.content.nomor}</td>
-												<td className="px-6 py-4">{d.content.tanggal}</td>
-												<td className="px-6 py-4 hidden md:table-cell">
-													{d.content.perihal}
-												</td>
-												<td className="px-6 py-4">
-													<div
-														onClick={() =>
-															router.push({
-																pathname: "/surat/disposisi/edit/[id]",
-																query: { id: d.id },
-															})
-														}
-														className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-amber-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-amber-600"
-													>
-														<PencilSquareIcon className="w-5" />
-														<p className="hidden md:inline-flex">Edit</p>
-													</div>
-												</td>
-											</tr>
-										);
-									})
+								documentData.slice(0, 5).map((d: any, i: any) => {
+									return (
+										<tr key={i} className="hover:bg-gray-700">
+											<td className="px-6 py-4">{d.type}</td>
+											<td className="px-6 py-4">{d.content.nomor}</td>
+											<td className="px-6 py-4">{d.content.tanggal}</td>
+											<td className="px-6 py-4 hidden md:table-cell">
+												{d.content.perihal}
+											</td>
+											<td className="px-6 py-4">
+												<div
+													onClick={() =>
+														router.push({
+															pathname: "/surat/disposisi/edit/[id]",
+															query: { id: d.id },
+														})
+													}
+													className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-amber-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-amber-600"
+												>
+													<PencilSquareIcon className="w-5" />
+													<p className="hidden md:inline-flex">Edit</p>
+												</div>
+											</td>
+										</tr>
+									);
+								})
 							) : (
 								documentData?.map((d: any, i: any) => {
 									return (

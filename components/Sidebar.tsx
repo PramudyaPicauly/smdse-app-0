@@ -13,6 +13,7 @@ import {
 	DocumentArrowUpIcon,
 	DocumentArrowDownIcon,
 	PowerIcon,
+	UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Sidebar() {
@@ -285,6 +286,13 @@ export default function Sidebar() {
 						<div className="flex gap-2 px-3 py-2">
 							<UserCircleIcon className="w-6" />
 							<p>{session?.user?.name}</p>
+						</div>
+						<div
+							className="flex gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-white hover:bg-opacity-10"
+							onClick={() => router.push("/auth/signup")}
+						>
+							<UserPlusIcon className="w-6" />
+							<p>Tambah Pengguna</p>
 						</div>
 						{/* UNLOCK ADMIN FEATURES */}
 						{/* {userData?.role === "ADMIN" && (

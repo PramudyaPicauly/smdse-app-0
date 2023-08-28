@@ -38,12 +38,21 @@ export default function SignUp() {
 
 	// CHECKING SESSION
 	useEffect(() => {
-		if (status === "authenticated") router.replace("/");
+		if (status === "unauthenticated") router.replace("/auth/signin");
 	}, [status]);
 
 	async function handleSignUp(e: SyntheticEvent): Promise<void> {
 		e.preventDefault();
 		try {
+			// if (secretCode !== "1234") {
+			// 	await Swal.fire({
+			// 		title: "Tidak Bisa Membuat Akun!",
+			// 		text: "Tidak memiliki akses untuk membuat akun",
+			// 		icon: "error",
+			// 		color: "#111827",
+			// 		confirmButtonColor: "#60a5fa",
+			// 	});
+			// } else
 			if (signUpCredentials.password !== passwordConfirm) {
 				await Swal.fire({
 					title: "Password Tidak Sama",
@@ -73,13 +82,15 @@ export default function SignUp() {
 										},
 									}
 								)
-								.then(() =>
-									Swal.fire({
-										title: "Akun Dibuat",
-										confirmButtonText: "OK",
-										confirmButtonColor: "#60a5fa",
-										icon: "success",
-									}).then(() => router.push("/auth/signin"))
+								.then(
+									() =>
+										Swal.fire({
+											title: "Akun Dibuat",
+											confirmButtonText: "OK",
+											confirmButtonColor: "#60a5fa",
+											icon: "success",
+										})
+									// .then(() => router.push("/auth/signin"))
 								)
 								.catch((error) => {
 									Swal.fire({
@@ -116,7 +127,7 @@ export default function SignUp() {
 			</Head>
 			<main className="relative flex justify-center items-center w-full min-h-screen">
 				<Image
-					src="/bg-kantor.jpg"
+					src="/img/bg-kantor.jpg"
 					alt="bg-kantor"
 					fill
 					className="absolute z-0"
@@ -129,7 +140,7 @@ export default function SignUp() {
 						<img
 							src="https://lskgemapedekabe.com/wp-content/uploads/2019/08/pdkb-e1566140008599.png"
 							alt="logo_gemapedekabe"
-							className="w-40 bg-gray-50/50 rounded-full"
+							className="w-40 bg-gray-200 rounded-full"
 						/>
 						<h2 className="text-center text-4xl font-bold">Sign Up</h2>
 					</div>
@@ -265,6 +276,17 @@ export default function SignUp() {
 							<option value="ADMIN">ADMIN</option>
 						</select>
 					</div>
+					{/* BUTTON */}
+					{/* <div className="flex flex-col">
+						<label>Kode Perusahaan :</label>
+						<input
+							required
+							type="password"
+							placeholder=". . ."
+							className="outline-none p-3 text-gray-800 bg-gray-200 rounded-md"
+							onChange={(e) => setSecretCode(e.target.value)}
+						/>
+					</div> */}
 					{/* BUTTON */}
 					<button
 						type="submit"

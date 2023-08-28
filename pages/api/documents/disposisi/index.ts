@@ -10,6 +10,7 @@ export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
+	const pij = req.query.page as string;
 	const { docContent, docType, docId } = req.body;
 	const session = await getServerSession(req, res, authOptions);
 
@@ -60,6 +61,8 @@ export default async function handler(
 				orderBy: {
 					createdAt: "desc",
 				},
+				take: 5,
+				skip: Number(pij) * 5,
 			});
 			res.status(200).json(getDoc);
 		}
