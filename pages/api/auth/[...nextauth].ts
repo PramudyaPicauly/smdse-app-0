@@ -86,6 +86,7 @@ export const authOptions: NextAuthOptions = {
 					role: token.role as string,
 					position: token.position as string,
 					isActive: token.isActive as string,
+					token: token,
 				},
 			};
 

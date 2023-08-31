@@ -20,7 +20,7 @@ export default async function handler(
 				where: {
 					author: {
 						id: {
-							equals: session.user?.id,
+							equals: "cljy1dytz0000fbagarv76czm",
 						},
 					},
 				},
@@ -65,7 +65,7 @@ export default async function handler(
 						content: { ...content.content },
 						author: {
 							connect: {
-								id: session.user?.id as string,
+								id: "cljy1dytz0000fbagarv76czm",
 							},
 						},
 					},
