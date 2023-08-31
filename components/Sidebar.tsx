@@ -287,13 +287,17 @@ export default function Sidebar() {
 							<UserCircleIcon className="w-6" />
 							<p>{session?.user?.name}</p>
 						</div>
-						<div
-							className="flex gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-white hover:bg-opacity-10"
-							onClick={() => router.push("/auth/signup")}
-						>
-							<UserPlusIcon className="w-6" />
-							<p>Tambah Pengguna</p>
-						</div>
+						{session?.user.role === "USER" ? (
+							<></>
+						) : (
+							<div
+								className="flex gap-2 px-3 py-2 rounded-md cursor-pointer hover:bg-white hover:bg-opacity-10"
+								onClick={() => router.push("/auth/signup")}
+							>
+								<UserPlusIcon className="w-6" />
+								<p>Tambah Pengguna</p>
+							</div>
+						)}
 						{/* UNLOCK ADMIN FEATURES */}
 						{/* {userData?.role === "ADMIN" && (
 							<Link
