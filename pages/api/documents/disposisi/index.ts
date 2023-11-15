@@ -17,7 +17,55 @@ export default async function handler(
 	if (session) {
 		// GET ALL DOCUMENT
 		if (req.method === "GET") {
-			const getDoc = await prisma.document.findMany({
+			const getPageDoc = await prisma.document.findMany({
+				where: {
+					AND: [
+						{
+							type: "DISPOSISI",
+						},
+						{
+							author: {
+								id: {
+									equals: session.user?.id,
+								},
+							},
+						},
+					],
+				},
+				select: {
+					recipients: {
+						select: {
+							createdAt: true,
+							recipientId: true,
+							recipient: {
+								select: {
+									id: true,
+									email: true,
+									isActive: true,
+									name: true,
+									position: true,
+									role: true,
+								},
+							},
+						},
+					},
+					eSign: true,
+					id: true,
+					content: true,
+					type: true,
+					createdAt: true,
+					author: true,
+					authorId: true,
+					isSent: true,
+					isApproved: true,
+				},
+				orderBy: {
+					createdAt: "desc",
+				},
+				take: 5,
+				skip: Number(pij) * 5,
+			});
+			const getAllDoc = await prisma.document.findMany({
 				where: {
 					AND: [
 						{
@@ -61,10 +109,11 @@ export default async function handler(
 				orderBy: {
 					createdAt: "desc",
 				},
-				take: 5,
-				skip: Number(pij) * 5,
 			});
-			res.status(200).json(getDoc);
+			res.status(200).json({
+				pageDoc: getPageDoc,
+				allDoc: getAllDoc,
+			});
 		}
 		// CREATE A DOCUMENT
 		else if (req.method === "POST") {

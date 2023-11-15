@@ -18,6 +18,8 @@ import prisma from "@/libs/prisma";
 // COMPONENTS
 import Layout from "@/components/Layout";
 import Loading from "@/components/Loading";
+import { UploadButton } from "@/utils/uploadthing";
+import Image from "next/image";
 
 const fetcher = async (url: string) =>
 	await axios.get(url).then((res) => res.data);
@@ -155,6 +157,19 @@ export default function Edit({ session, params }: any) {
 		}
 	};
 
+	const handleUploadImage = async (esignURL: string) => {
+		await axios.post(
+			`/api/esignature`,
+			{
+				docId: docData.id,
+				docSign: esignURL,
+			},
+			{
+				headers: { "Content-Type": "application/json" },
+			}
+		);
+	};
+
 	const handleSend = async (e: SyntheticEvent) => {
 		e.preventDefault();
 		try {
@@ -270,7 +285,8 @@ export default function Edit({ session, params }: any) {
 							type="text"
 							placeholder="..."
 							defaultValue={docData?.content?.nomor}
-							className="w-2/3 sm:w-3/4 outline-none bg-gray-200 px-4 py-2 rounded-md"
+							className="w-2/3 sm:w-3/4 outline-none bg-gray-300 text-gray-500 px-4 py-2 rounded-md"
+							disabled
 							onChange={(e) =>
 								setUpdateDocData({
 									...docData,
@@ -928,6 +944,34 @@ export default function Edit({ session, params }: any) {
 						/>
 					</div>
 
+					<div className="flex items-center gap-6 w-full">
+						<label className="w-2/6 sm:w-3/12 font-semibold bg-gray-800 px-4 py-2 rounded-md text-white">
+							Tanda Tangan
+						</label>
+						{docData?.eSign ? (
+							<div className="flex justify-center w-1/6 sm:w-5/12 outline-none bg-gray-200 px-4 py-2 rounded-md">
+								<img src={docData.eSign} alt="e-sign" width={100} />
+							</div>
+						) : (
+							<></>
+						)}
+
+						<UploadButton
+							className="w-3/6 sm:w-4/12 outline-none bg-gray-200 px-4 py-2 rounded-md"
+							endpoint="imageUploader"
+							onClientUploadComplete={(res) => {
+								// Do something with the response
+								console.log("Files: ", res);
+								alert(`Upload Completed, URL = ${res[0].url}`);
+								handleUploadImage(res[0].url);
+							}}
+							onUploadError={(error: Error) => {
+								// Do something with the error.
+								alert(`ERROR! ${error.message}`);
+							}}
+						/>
+					</div>
+
 					{/* ========== SIMPAN ========== */}
 					<div className="flex justify-end gap-2 w-full">
 						<div className="flex gap-2 h-fit text-white">
@@ -997,21 +1041,25 @@ export default function Edit({ session, params }: any) {
 									</button>
 								)}
 							</div>
-							{docData?.recipients?.length !== 0 && (
-								<>
-									<div>
-										<h2 className="font-semibold">Terkirim Ke:</h2>
-										<ul>
-											{docData?.recipients?.map((data: any, index: any) => {
-												return (
-													<li key={index}>{`${index + 1}. ${
-														data.recipient.name
-													}`}</li>
-												);
-											})}
-										</ul>
-									</div>
-								</>
+							{docData.isSent ? (
+								docData?.recipients?.length !== 0 && (
+									<>
+										<div>
+											<h2 className="font-semibold">Terkirim Ke:</h2>
+											<ul>
+												{docData?.recipients?.map((data: any, index: any) => {
+													return (
+														<li key={index}>{`${index + 1}. ${
+															data.recipient.name
+														}`}</li>
+													);
+												})}
+											</ul>
+										</div>
+									</>
+								)
+							) : (
+								<></>
 							)}
 						</div>
 					</div>

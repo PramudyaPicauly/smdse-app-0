@@ -10,18 +10,25 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
+    "@nativedocuments/docx-wasm": "^2.2.13-1561490777",
     "@prisma/client": "^4.13.0",
     "@types/file-saver": "^2.0.5",
     "@types/node": "18.16.3",
     "@types/react": "18.2.4",
     "@types/react-dom": "18.2.3",
+    "@uploadthing/react": "^5.7.0",
     "autoprefixer": "10.4.14",
+    "awesome-unoconv": "^1.0.1",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.0",
+    "docx-pdf": "^0.0.1",
     "docx-templates": "^4.11.1",
+    "dom-to-image": "^2.6.0",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.4",
     "file-saver": "^2.0.5",
+    "jspdf": "^2.5.1",
+    "libreoffice-convert": "^1.4.1",
     "next": "13.3.4",
     "next-auth": "^4.22.1",
     "postcss": "8.4.23",
@@ -32,10 +39,12 @@
     "sweetalert2": "^11.7.5",
     "swr": "^2.1.5",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "uploadthing": "^5.7.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/dom-to-image": "^2.6.5",
     "prisma": "^4.13.0",
     "ts-node": "^10.9.1"
   }

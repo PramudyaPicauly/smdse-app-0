@@ -28,7 +28,7 @@ model User {
 
 enum UserRole {
   USER
-  SUPERUSER
+  SUPER_USER
   ADMIN
 }
 
@@ -50,8 +50,10 @@ model Document {
   createdAt  DateTime      @default(now()) @db.Timestamp()
   isSent     Boolean       @default(false)
   isApproved Boolean       @default(false)
+  isDone     Boolean       @default(false)
   content    Json?         @db.JsonB
   type       DocumentType?
+  eSign      String?       @db.Text
 
   author     User?            @relation(fields: [authorId], references: [id])
   authorId   String?
@@ -72,6 +74,7 @@ model UserOnDocument {
   documentId  String
   createdAt   DateTime @default(now()) @db.Timestamp()
   isRead      Boolean  @default(false)
+  isReadd     Boolean  @default(false)
 
   @@id([recipientId, documentId])
 }

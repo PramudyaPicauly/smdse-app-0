@@ -26,6 +26,8 @@ export default async function handler(
 							select: {
 								createdAt: true,
 								recipientId: true,
+								isRead: true,
+								isReadd: true,
 								recipient: {
 									select: {
 										id: true,
@@ -38,6 +40,7 @@ export default async function handler(
 								},
 							},
 						},
+						eSign: true,
 						id: true,
 						content: true,
 						type: true,

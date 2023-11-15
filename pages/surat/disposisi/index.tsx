@@ -39,7 +39,7 @@ export default function Disposisi() {
 		data,
 		error,
 		isLoading,
-	}: { data: IDocumentData[]; error: any; isLoading: boolean } = useSWR(
+	}: { data: any; error: any; isLoading: boolean } = useSWR(
 		session ? `/api/documents/disposisi?page=${pageState}` : null,
 		fetcher,
 		{
@@ -87,14 +87,15 @@ export default function Disposisi() {
 	}
 
 	async function handleSearch(e: any) {
-		const results: any = data.filter((data: any) => {
-			if (e.target.value === "") return data;
-			return data.content.nomor
+		const results: any = data.allDoc.filter((d: any) => {
+			if (e.target.value === "") return d;
+			return d.content.nomor
 				.toLowerCase()
 				.includes(e.target.value.toLowerCase());
 		});
 		setSearchData(results);
 	}
+	// console.log(Math.ceil(data?.allDoc?.length / 5) + "wee");
 
 	return (
 		<>
@@ -137,7 +138,10 @@ export default function Disposisi() {
 							<button
 								type="button"
 								className="flex gap-2 p-3  transition-all duration-150 bg-red-400 hover:bg-red-600 cursor-pointer"
-								onClick={() => setIsSearching(false)}
+								onClick={() => {
+									setIsSearching(false);
+									setSearchData([]);
+								}}
 							>
 								<XMarkIcon className="w-6" />
 							</button>
@@ -216,14 +220,14 @@ export default function Disposisi() {
 										</tr>
 									);
 								})
-							) : data?.length === 0 ? (
+							) : data?.pageDoc?.length === 0 ? (
 								<tr>
 									<td colSpan={4} className="px-6 py-4 text-center">
 										<p>Belum ada disposisi dibuat.</p>
 									</td>
 								</tr>
 							) : (
-								data?.map((d: any, i: any) => {
+								data?.pageDoc?.map((d: any, i: any) => {
 									return (
 										<tr key={i} className="hover:bg-gray-700">
 											<td className="px-6 py-4">{d.content.nomor}</td>
@@ -233,25 +237,45 @@ export default function Disposisi() {
 											</td>
 											<td className="flex gap-2 px-6 py-4">
 												<DownloadDisposisi data={d} />
-												<div
-													onClick={() =>
-														router.push({
-															pathname: "/surat/disposisi/edit/[id]",
-															query: { id: d.id },
-														})
-													}
-													className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-amber-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-amber-600"
-												>
-													<PencilSquareIcon className="w-5" />
-													<p className="hidden md:inline-flex">Edit</p>
-												</div>
-												<div
-													className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-red-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-red-600"
-													onClick={() => handleDelete(d.id, d.isSent)}
-												>
-													<TrashIcon className="w-5" />
-													<p className="hidden md:inline-flex">Hapus</p>
-												</div>
+												{d.recipients.length === 0 ? (
+													<>
+														<div
+															onClick={() =>
+																router.push({
+																	pathname: "/surat/disposisi/edit/[id]",
+																	query: { id: d.id },
+																})
+															}
+															className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-amber-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-amber-600"
+														>
+															<PencilSquareIcon className="w-5" />
+															<p className="hidden md:inline-flex">Edit</p>
+														</div>
+
+														<div
+															className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-red-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-red-600"
+															onClick={() => handleDelete(d.id, d.isSent)}
+														>
+															<TrashIcon className="w-5" />
+															<p className="hidden md:inline-flex">Hapus</p>
+														</div>
+													</>
+												) : d.isSent === true ? (
+													<div
+														onClick={() =>
+															router.push({
+																pathname: "/surat/disposisi/edit/[id]",
+																query: { id: d.id },
+															})
+														}
+														className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-amber-400 text-slate-800 cursor-pointer transition-colors duration-200 hover:text-white hover:bg-amber-600"
+													>
+														<PencilSquareIcon className="w-5" />
+														<p className="hidden md:inline-flex">Edit</p>
+													</div>
+												) : (
+													<></>
+												)}
 											</td>
 										</tr>
 									);
@@ -261,38 +285,53 @@ export default function Disposisi() {
 					</table>
 				</div>
 				<div className="flex divide-x-2 divide-gray-600 w-fit ml-auto rounded-md bg-gray-800 text-white">
-					<button
-						type="button"
-						className="px-3 py-2 rounded-l-md hover:bg-gray-600"
-						onClick={() => {
-							if (pageState - 1 < 0) {
-								setPageState(0);
-							} else {
-								setPageState(pageState - 1);
-							}
-						}}
-					>
-						Prev
-					</button>
-					<button type="button" className="px-3 py-2 hover:bg-gray-600">
+					{data?.allDoc?.length > 5 && isSearching === false ? (
+						<>
+							{pageState === 0 ? (
+								<></>
+							) : (
+								<button
+									type="button"
+									className="px-3 py-2 rounded-l-md hover:bg-gray-600"
+									onClick={() => {
+										if (pageState - 1 < 0) {
+											setPageState(0);
+										} else {
+											setPageState(pageState - 1);
+										}
+									}}
+								>
+									Prev
+								</button>
+							)}
+
+							{/* <button type="button" className="px-3 py-2 hover:bg-gray-600">
 						1
 					</button>
 					<button type="button" className="px-3 py-2 hover:bg-gray-600">
 						2
-					</button>
-					<button
-						type="button"
-						className="px-3 py-2 rounded-r-md hover:bg-gray-600"
-						onClick={() => {
-							if (pageState + 1 > 2) {
-								setPageState(pageState);
-							} else {
-								setPageState(pageState + 1);
-							}
-						}}
-					>
-						Next
-					</button>
+					</button> */}
+							{pageState === Math.floor(data?.allDoc?.length / 5) ? (
+								<></>
+							) : (
+								<button
+									type="button"
+									className="px-3 py-2 rounded-r-md hover:bg-gray-600"
+									onClick={() => {
+										if (pageState + 1 > Math.floor(data?.allDoc?.length / 5)) {
+											setPageState(pageState);
+										} else {
+											setPageState(pageState + 1);
+										}
+									}}
+								>
+									Next
+								</button>
+							)}
+						</>
+					) : (
+						<></>
+					)}
 				</div>
 			</Layout>
 		</>

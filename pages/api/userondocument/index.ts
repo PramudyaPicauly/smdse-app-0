@@ -11,6 +11,7 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	const session = await getServerSession(req, res, authOptions);
+	const { docId } = req.body;
 
 	if (session) {
 		if (req.method === "GET") {
@@ -29,7 +30,14 @@ export default async function handler(
 			try {
 				const result = await prisma.userOnDocument.updateMany({
 					where: {
-						recipientId: session.user?.id,
+						AND: [
+							{
+								recipientId: session.user?.id,
+							},
+							{
+								documentId: docId,
+							},
+						],
 					},
 					data: {
 						isRead: true,

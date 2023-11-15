@@ -20,7 +20,7 @@ export default async function handler(
 					where: {
 						AND: [
 							{
-								isSent: true,
+								isDone: true,
 							},
 							{
 								author: {
@@ -44,24 +44,6 @@ export default async function handler(
 						type: true,
 						author: true,
 						authorId: true,
-						recipients: {
-							select: {
-								createdAt: true,
-								recipientId: true,
-								isRead: true,
-								isReadd: true,
-								recipient: {
-									select: {
-										id: true,
-										email: true,
-										isActive: true,
-										name: true,
-										position: true,
-										role: true,
-									},
-								},
-							},
-						},
 					},
 					orderBy: {
 						createdAt: "desc",

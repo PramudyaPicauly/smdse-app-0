@@ -82,15 +82,13 @@ export default function SignUp() {
 										},
 									}
 								)
-								.then(
-									() =>
-										Swal.fire({
-											title: "Akun Dibuat",
-											confirmButtonText: "OK",
-											confirmButtonColor: "#60a5fa",
-											icon: "success",
-										})
-									// .then(() => router.push("/auth/signin"))
+								.then(() =>
+									Swal.fire({
+										title: "Akun Dibuat",
+										confirmButtonText: "OK",
+										confirmButtonColor: "#60a5fa",
+										icon: "success",
+									}).then(() => router.reload())
 								)
 								.catch((error) => {
 									Swal.fire({

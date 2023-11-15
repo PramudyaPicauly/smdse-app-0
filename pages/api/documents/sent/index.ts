@@ -37,6 +37,11 @@ export default async function handler(
 						type: true,
 						author: true,
 						authorId: true,
+						recipients: {
+							include: {
+								recipient: true,
+							},
+						},
 					},
 					orderBy: {
 						createdAt: "desc",
@@ -72,28 +77,28 @@ export default async function handler(
 			}
 		}
 		// UNSEND A DOCUMENT
-		else if (req.method === "DELETE") {
-			const { documentId } = req.body;
-			try {
-				const unsendDoc = await prisma.userOnDocument.deleteMany({
-					where: {
-						documentId,
-					},
-				});
-				const docUnsent = await prisma.document.update({
-					where: {
-						id: documentId,
-					},
-					data: {
-						isSent: false,
-					},
-				});
+		// else if (req.method === "DELETE") {
+		// 	const { documentId } = req.body;
+		// 	try {
+		// 		const unsendDoc = await prisma.userOnDocument.deleteMany({
+		// 			where: {
+		// 				documentId,
+		// 			},
+		// 		});
+		// 		const docUnsent = await prisma.document.update({
+		// 			where: {
+		// 				id: documentId,
+		// 			},
+		// 			data: {
+		// 				isSent: false,
+		// 			},
+		// 		});
 
-				res.status(200).json(docUnsent);
-			} catch (error) {
-				res.status(500).send({ message: "Failed to Unsend Document" });
-			}
-		}
+		// 		res.status(200).json(docUnsent);
+		// 	} catch (error) {
+		// 		res.status(500).send({ message: "Failed to Unsend Document" });
+		// 	}
+		// }
 	} else {
 		res.status(401).json({ message: "Unauthorized" });
 	}

@@ -139,7 +139,8 @@ export default function Buat({ nomorDisposisi }: any) {
 							type="text"
 							placeholder="..."
 							defaultValue={nomorDisposisi}
-							className="w-2/3 sm:w-3/4 outline-none bg-gray-200 px-4 py-2 rounded-md"
+							className="w-2/3 sm:w-3/4 outline-none bg-gray-300 text-gray-500 px-4 py-2 rounded-md"
+							disabled
 							onChange={(e) =>
 								setDisposisiContent({
 									...disposisiContent,

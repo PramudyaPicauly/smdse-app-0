@@ -1,52 +1,39 @@
-import { saveAs } from "file-saver";
+let docxConverter = require("docx-pdf");
+let libre = require("libreoffice-convert");
+let path = require("path");
+let docx = require("@nativedocuments/docx-wasm");
+import fs from "fs";
+
+// NEXT
+import type { NextApiRequest, NextApiResponse } from "next";
+
+// DEPENDENCY
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import createReport from "docx-templates";
-import axios from "axios";
-import useSWR from "swr";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import { FolderArrowDownIcon } from "@heroicons/react/24/outline";
 
-// UPDATE PDF
-import domtoimage from "dom-to-image";
-import jsPDF from "jspdf";
-import { useRef, useState } from "react";
-import { HtmlTemplate } from "./HtmlTemplate";
-type TIndeks = "rahasia" | "penting" | "biasarutin" | undefined;
+libre.convertAsync = require("util").promisify(libre.convert);
 
-export default function DownloadDisposisi(props: any) {
-	const { data: session } = useSession();
-	const router = useRouter();
+export default async function handler(
+	req: NextApiRequest,
+	res: NextApiResponse
+) {
+	const session = await getServerSession(req, res, authOptions);
+	const { title, disposisiData, resourceData } = req.body;
+	if (session) {
+		if (req.method === "POST") {
+			const fileTitle = title.replaceAll("/", "_");
 
-	const [indeksState, setIndeksState] = useState<TIndeks>(undefined);
-	const ref = useRef(null);
-
-	const fetcher = async (url: string) =>
-		await axios.get(url).then((res) => res.data);
-
-	const {
-		data: resourceData,
-		error: resourceError,
-		isLoading: resourceIsLoading,
-	} = useSWR(session ? `/api/resources` : null, fetcher);
-
-	if (resourceIsLoading) return null;
-	if (resourceError) alert(resourceError);
-	// if (data || resourceData) return;
-
-	const handleDownload = async (e: any, disposisiData: any) => {
-		e.preventDefault();
-
-		const redBoxImg = async () => {
-			const strToDataURL: any = resourceData.img.redbox;
-			const data = strToDataURL.slice("data:image/png;base64,".length);
-			return { width: 0.5334, height: 0.4572, data, extension: ".png" };
-		};
-		const whiteBoxImg = async () => {
-			const strToDataURL: any = resourceData.img.whitebox;
-			const data = strToDataURL.slice("data:image/png;base64,".length);
-			return { width: 0.5334, height: 0.4572, data, extension: ".png" };
-		};
-		try {
+			const redBoxImg = async () => {
+				const strToDataURL: any = resourceData.img.redbox;
+				const data = strToDataURL.slice("data:image/png;base64,".length);
+				return { width: 0.5334, height: 0.4572, data, extension: ".png" };
+			};
+			const whiteBoxImg = async () => {
+				const strToDataURL: any = resourceData.img.whitebox;
+				const data = strToDataURL.slice("data:image/png;base64,".length);
+				return { width: 0.5334, height: 0.4572, data, extension: ".png" };
+			};
 			const buffer = await createReport({
 				template: Buffer.from(resourceData.template.disposisi),
 				data: {
@@ -191,54 +178,70 @@ export default function DownloadDisposisi(props: any) {
 					},
 				},
 			});
-			const blob = new Blob([buffer]);
-			saveAs(blob, `${disposisiData.content.nomor}.docx`);
-			await router.replace(router.asPath);
-		} catch (error) {
-			console.error(error);
+			// console.log(buffer);
+
+			fs.writeFileSync(`docs/${fileTitle}`, buffer);
+
+			// setTimeout(async () => {
+			// 	await docxConverter(
+			// 		`./docs/006.LD_PDKB_2023.docx`,
+			// 		`./docs/006.LD_PDKB_2023.pdf`,
+			// 		function (err, result) {
+			// 			if (err) {
+			// 				console.log(err);
+			// 			} else console.log(result);
+			// 		}
+			// 	);
+			// }, 3);
+
+			// init docx engine
+			// docx
+			// 	.init({
+			// 		// ND_DEV_ID: "XXXXXXXXXXXXXXXXXXXXXXXXXX",    // goto https://developers.nativedocuments.com/ to get a dev-id/dev-secret
+			// 		// ND_DEV_SECRET: "YYYYYYYYYYYYYYYYYYYYYYYYYY", // you can also set the credentials in the enviroment variables
+			// 		ENVIRONMENT: "NODE", // required
+			// 		LAZY_INIT: true, // if set to false the WASM engine will be initialized right now, usefull pre-caching (like e.g. for AWS lambda)
+			// 	})
+			// 	.catch(function (e) {
+			// 		console.error(e);
+			// 	});
+
+			// const convertHelper = async (document, exportFct) => {
+			// 	const api = await docx.engine();
+			// 	await api.load(document);
+			// 	const arrayBuffer = await api[exportFct]();
+			// 	await api.close();
+			// 	return arrayBuffer;
+			// };
+
+			// convertHelper("./docs/disposisi-temp.docx", "exportPDF")
+			// 	.then((arrayBuffer) => {
+			// 		fs.writeFileSync("sample.pdf", new Uint8Array(arrayBuffer));
+			// 	})
+			// 	.catch((e) => {
+			// 		console.error(e);
+			// 	});
+
+			// const path = require("path");
+			// const unoconv = require("awesome-unoconv");
+
+			// const sourceFilePath = path.resolve(
+			// 	"./docs/surat-pernyataan-dosen-pembimbing-2.docx"
+			// );
+			// const outputFilePath = path.resolve(
+			// 	"./docs/surat-pernyataan-dosen-pembimbing-2.pdf"
+			// );
+
+			// unoconv
+			// 	.convert(sourceFilePath, outputFilePath)
+			// 	.then((result) => {
+			// 		console.log(result); // return outputFilePath
+			// 	})
+			// 	.catch((err) => {
+			// 		console.log(err);
+			// 	});
 		}
-	};
-
-	const handleDownloadPDF = async (data) => {
-		const scale = 4;
-
-		const img = await domtoimage.toPng(ref.current, {
-			width: ref.current.clientWidth * scale,
-			height: ref.current.clientHeight * scale,
-			style: {
-				transform: "scale(" + scale + ")",
-				transformOrigin: "top left",
-			},
-		});
-
-		const doc = new jsPDF("p", "in", "letter");
-		doc.addImage(img, "png", 0, 0, 8.5, 11);
-		doc.save(`${data.content.nomor}.pdf`);
-	};
-
-	console.log(ref.current);
-
-	return (
-		<>
-			<div className="flex gap-2">
-				<div
-					className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-blue-400 text-slate-800 transition-colors duration-200 hover:text-white hover:bg-blue-600 cursor-pointer"
-					onClick={(e) => handleDownload(e, props.data)}
-				>
-					<FolderArrowDownIcon className="w-5" />
-					<p className="hidden md:inline-flex">DOCX</p>
-				</div>
-				<div
-					className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-red-600 text-slate-800 transition-colors duration-200 hover:text-white hover:bg-red-800 cursor-pointer"
-					onClick={(e) => handleDownloadPDF(props.data)}
-				>
-					<FolderArrowDownIcon className="w-5" />
-					<p className="hidden md:inline-flex">PDF</p>
-				</div>
-			</div>
-			<div className="fixed -left-[9in]">
-				<HtmlTemplate ref={ref} data={props.data} />
-			</div>
-		</>
-	);
+	} else {
+		res.status(401).json({ message: "Unauthorized" });
+	}
 }

@@ -32,6 +32,7 @@ export interface IDocumentData {
 	isApproved?: boolean;
 	content?: IDisposisiContent;
 	type?: string;
+	eSign?: string;
 	authorId?: string;
 	recipients?: [];
 }

@@ -11,14 +11,16 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	const session = await getServerSession(req, res, authOptions);
+	const { docId } = req.body;
 
 	if (session) {
 		// GET ALL SENT DOCUMENT
 		if (req.method === "GET") {
 			try {
-				const getDoc = await prisma.document.findMany({
+				const getDoc = await prisma.document.findUnique({
 					where: {
 						AND: [
+							{ id: docId },
 							{
 								isSent: true,
 							},

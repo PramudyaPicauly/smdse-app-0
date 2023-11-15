@@ -1,7 +1,4 @@
-// NEXT
 import type { NextApiRequest, NextApiResponse } from "next";
-
-// DEPENDENCY
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import prisma from "@/libs/prisma";
@@ -16,7 +13,6 @@ export default async function handler(
 
 	if (session) {
 		if (req.method === "GET") {
-			// GET SPECIFIC SENT FILE
 			try {
 				const result = await prisma.document.findMany({
 					where: {
@@ -35,7 +31,6 @@ export default async function handler(
 				res.status(401).send({ message: "Failed to GET" });
 			}
 		} else if (req.method === "PUT") {
-			// SENT DOC
 			try {
 				const documentIsSent = await prisma.document.update({
 					where: {
@@ -56,24 +51,24 @@ export default async function handler(
 				res.status(401).send({ message: "Failed to PUT" });
 			}
 		} else if (req.method === "DELETE") {
-			// UNSENT DOC
 			try {
-				const result = await prisma.userOnDocument.deleteMany({
-					where: {
-						documentId: id,
-					},
-				});
-				const result2 = await prisma.document.update({
+				// const result = await prisma.userOnDocument.deleteMany({
+				// 	where: {
+				// 		documentId: id,
+				// 	},
+				// });
+				const result = await prisma.document.update({
 					where: {
 						id: id,
 					},
 					data: {
 						isSent: false,
+						isDone: true,
 					},
 				});
-				res.json(result2);
+				res.json({});
 			} catch (error) {
-				res.status(401).send({ message: "Failed to DELETE" });
+				res.status(401).send({});
 			}
 		}
 	} else {

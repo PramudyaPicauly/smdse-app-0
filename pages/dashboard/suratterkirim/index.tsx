@@ -6,17 +6,30 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import useSWR from "swr";
 import Swal from "sweetalert2";
-import { EyeIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
+import {
+	CheckBadgeIcon,
+	CheckCircleIcon,
+	CheckIcon,
+	EyeIcon,
+	MinusCircleIcon,
+	UserGroupIcon,
+	XMarkIcon,
+} from "@heroicons/react/24/outline";
 // COMPONENTS
 import Layout from "@/components/Layout";
 import { IDocumentData } from "@/interfaces/interfaces";
+import { useState } from "react";
 // FETCHER
 const sentURL = "/api/documents/sent";
+const historyURL = "/api/documents/history";
 const fetcher = async (url: string) =>
 	await axios.get(url).then((res) => res.data);
 
 export default function SuratTerkirim() {
 	// DEPENDENCIES FUNCTIONS
+	const [showSentId, setShowSentId] = useState(false);
+	const [sentId, setSentId] = useState("");
+
 	const router = useRouter();
 	const { data: session } = useSession();
 	// FETCH DATA
@@ -31,6 +44,19 @@ export default function SuratTerkirim() {
 			refreshInterval: 1000,
 		}
 	);
+
+	const {
+		data: docData,
+		error: docError,
+		isLoading: docLoading,
+	}: { data: IDocumentData; error: any; isLoading: boolean } = useSWR(
+		!session ? null : sentId ? `/api/documents/${sentId}` : null,
+		fetcher,
+		{
+			refreshInterval: 1000,
+		}
+	);
+
 	if (isLoading) return null;
 	if (error) alert(error);
 	// FUNCTIONS
@@ -70,6 +96,8 @@ export default function SuratTerkirim() {
 		}
 	}
 
+	console.log(docData);
+
 	return (
 		<>
 			<Head>
@@ -94,7 +122,7 @@ export default function SuratTerkirim() {
 								</th>
 								<th
 									scope="col"
-									className="px-6 py-4 font-medium dden md:table-cell"
+									className="px-6 py-4 font-medium hidden md:table-cell"
 								>
 									Tanggal
 								</th>
@@ -105,6 +133,9 @@ export default function SuratTerkirim() {
 									Perihal
 								</th>
 								<th scope="col" className="px-6 py-4 font-medium">
+									Penerima
+								</th>
+								<th scope="col" className="px-6 py-4 font-medium">
 									Aksi
 								</th>
 							</tr>
@@ -113,7 +144,7 @@ export default function SuratTerkirim() {
 							{data?.length === 0 ? (
 								<>
 									<tr>
-										<td colSpan={5} className="px-6 py-4 text-center">
+										<td colSpan={6} className="px-6 py-4 text-center">
 											<p>Belum ada surat terkirim.</p>
 										</td>
 									</tr>
@@ -129,6 +160,18 @@ export default function SuratTerkirim() {
 											</td>
 											<td className="px-6 py-4 hidden md:table-cell">
 												{data.content.perihal}
+											</td>
+											<td className="px-6 py-4">
+												<div
+													onClick={() => {
+														setShowSentId(true);
+														setSentId(data?.id);
+													}}
+													className="flex items-center gap-1 w-fit px-2 py-1 rounded-md bg-gray-300 text-slate-800 transition-colors duration-200 hover:text-white hover:bg-gray-400 cursor-pointer"
+												>
+													<UserGroupIcon className="w-5" />
+													<p>Info</p>
+												</div>
 											</td>
 											<td className="flex gap-2 px-6 py-4">
 												<div
@@ -158,6 +201,55 @@ export default function SuratTerkirim() {
 						</tbody>
 					</table>
 				</div>
+				{showSentId ? (
+					<div
+						onClick={() => {
+							setShowSentId(false);
+							setSentId("");
+						}}
+						className="fixed top-0 left-0 w-full h-screen flex justify-center items-center bg-black bg-opacity-40"
+					>
+						<div className="overflow-hidden rounded-lg">
+							<table className="w-fit border-collapse bg-gray-600 text-left text-sm text-white">
+								<thead className="bg-gray-800">
+									<tr>
+										<th scope="col" className="px-6 py-4 font-medium">
+											Penerima
+										</th>
+										<th scope="col" className="px-6 py-4 font-medium">
+											Diterima
+										</th>
+										<th scope="col" className="px-6 py-4 font-medium">
+											Dibaca
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y divide-gray-700">
+									{docData?.recipients?.map((d, i) => {
+										return (
+											<tr className="hover:bg-gray-700" key={i}>
+												<td className="px-6 py-4">{d?.recipient?.name}</td>
+
+												<td className="px-6 py-4">
+													{new Date(d?.createdAt).toLocaleString("id-ID")}
+												</td>
+												<td className="px-6 py-4">
+													{d?.isRead ? (
+														<CheckIcon className="w-6 p-1 bg-green-600 rounded-full" />
+													) : (
+														<XMarkIcon className="w-6 p-1 bg-red-600 rounded-full" />
+													)}
+												</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				) : (
+					<></>
+				)}
 			</Layout>
 		</>
 	);

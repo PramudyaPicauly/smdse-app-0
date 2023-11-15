@@ -7,6 +7,8 @@ import prisma from "@/libs/prisma";
 import { IDocumentData, ISession } from "@/interfaces/interfaces";
 // COMPONENTS
 import Layout from "@/components/Layout";
+import { useEffect } from "react";
+import axios from "axios";
 
 export const getServerSideProps: GetServerSideProps = async ({
 	req,
@@ -60,6 +62,24 @@ export default function View({
 	disposisi: IDocumentData;
 	session: ISession;
 }) {
+	async function handleRead(): Promise<void> {
+		if (session)
+			try {
+				await axios.put(
+					"/api/userondocument",
+					{ docId: disposisi?.id },
+					{
+						headers: { "Content-Type": "application/json" },
+					}
+				);
+			} catch (error) {
+				alert(error);
+			}
+	}
+	useEffect(() => {
+		handleRead();
+	}, []);
+
 	return (
 		<>
 			<Head>

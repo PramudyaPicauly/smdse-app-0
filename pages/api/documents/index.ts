@@ -65,7 +65,7 @@ export default async function handler(
 						content: { ...content.content },
 						author: {
 							connect: {
-								id: "cljy1dytz0000fbagarv76czm",
+								id: "clobwnj1v0004fb304kpo4eyf",
 							},
 						},
 					},
